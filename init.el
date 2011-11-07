@@ -52,7 +52,6 @@
                                   starter-kit-bindings starter-kit-js
                                   color-theme color-theme-twilight
                                   markdown-mode yaml-mode
-                                  auto-complete
                                   cygwin-mount
                                   marmalade oddmuse))
 
@@ -60,8 +59,40 @@
   (when (not (package-installed-p p))
     (package-install p)))
 
-;; backport some functionality to Emacs 22 if needed
-;;(require 'dominating-file)
+
+;;; add el-get package,use it manager git,svn... packages
+(add-to-list 'load-path (concat dotfiles-dir "el-get/el-get" ))
+(unless (require 'el-get nil t)
+  (url-retrieve
+   "https://raw.github.com/dimitri/el-get/master/el-get-install.el"
+   (lambda (s)
+       (end-of-buffer)
+       (eval-print-last-sexp))))
+;;; set local sources
+(setq el-get-sources
+      '((:name smart-mark
+               :type git
+               :url "https://github.com/brianjcj/smart-mark.git"
+               :post-init (lambda () (require 'smart-mark)))
+        (:name lintnode
+               :type git
+               :url "https://github.com/davidmiller/lintnode.git"
+               :post-init (lambda () (require 'flymake-jslint)
+                            (setq lintnode-location
+                                  (concat el-get-dir  "lintnode"))
+                            (setq lintnode-jslint-excludes
+                                   (list 'nomen 'undef 'plusplus 'onevar 'white))
+                            (add-hook 'js-mode-hook
+                                      (lambda ()
+                                        (lintnode-hook)))))
+        ))
+
+(setq my-el-packages
+      (append
+       '(el-get auto-complete yasnippet)
+       (mapcar 'el-get-source-name el-get-sources)))
+
+(el-get 'sync my-el-packages)
 
 ;; You can keep all- user-specific customizations here
 (setq system-specific-config (concat dotfiles-dir system-name ".el")
@@ -69,7 +100,8 @@
       user-all-dir (concat dotfiles-dir "all")
       user-specific-config (concat dotfiles-dir user-login-name ".el")
       user-specific-dir (concat dotfiles-dir user-login-name))
-(add-to-list 'load-path (list user-specific-dir user-all-dir))
+(add-to-list 'load-path user-specific-dir)
+(add-to-list 'load-path user-all-dir)
 
 (if (file-exists-p system-specific-config) (load system-specific-config))
 (if (file-exists-p user-all-config) (load user-all-config))
