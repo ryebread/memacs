@@ -53,6 +53,7 @@
                                   color-theme color-theme-twilight
                                   markdown-mode yaml-mode
                                   cygwin-mount
+                                  maxframe undo-tree
                                   marmalade oddmuse))
 
 (dolist (p my-packages)
@@ -74,17 +75,22 @@
                :type git
                :url "https://github.com/brianjcj/smart-mark.git"
                :post-init (lambda () (require 'smart-mark)))
-        (:name lintnode
+        (:name jshint-mode
                :type git
-               :url "https://github.com/davidmiller/lintnode.git"
-               :post-init (lambda () (require 'flymake-jslint)
-                            (setq lintnode-location
-                                  (concat el-get-dir  "lintnode"))
-                            (setq lintnode-jslint-excludes
-                                   (list 'nomen 'undef 'plusplus 'onevar 'white))
-                            (add-hook 'js-mode-hook
-                                      (lambda ()
-                                        (lintnode-hook)))))
+               :url "https://github.com/daleharvey/jshint-mode.git"
+               :post-init (lambda ()
+                            (require 'flymake-jshint)
+                            (add-hook 'javascript-mode-hook
+                                      (lambda () (flymake-mode t)))
+                            ))
+        (:name jade-mode
+               :type git
+               :url "https://github.com/brianc/jade-mode.git"
+               :post-init (lambda ()
+                            (require 'sws-mode)
+                            (require 'jade-mode)
+                            (add-to-list 'auto-mode-alist  '("\\.styl$" . sws-mode))
+                            (add-to-list 'auto-mode-alist '("\\.jade$" . sws-mode))))
         ))
 
 (setq my-el-packages

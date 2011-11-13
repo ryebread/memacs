@@ -4,3 +4,4 @@ places
 .smex*
 el-get/
 ac-*
+/auto-save-list/*
