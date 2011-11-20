@@ -29,6 +29,7 @@
 
 
 (global-set-key (kbd "C-x C-k") 'my-clean-buffers) ;delete temp buffers
+(global-set-key (kbd "C-c C-k") 'my-clean-slate)   ;clean slate
 
 ;; Jump to a definition in the current file. (This is awesome.)
 (global-set-key (kbd "M-i") 'my-ido-goto-symbol)
