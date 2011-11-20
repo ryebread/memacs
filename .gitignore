@@ -6,3 +6,5 @@ el-get/
 ac-*
 /auto-save-list/*
 /eshell/history
+/bookmarks
+/custom.el

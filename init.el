@@ -1,7 +1,7 @@
 ;; -*- Emacs-Lisp -*- init.el --- Where all the magic begins
 
 ;; Copyright (C) 1996-2010 Liubin
-;; Time-stamp: <2010-10-10 14:31:18 Sunday by ryebread>
+;; Time-stamp: <2011-11-20 12:09:33 Sunday by ryebread>
 
 ;;  __
 ;; / /   ()    /7  ()_
@@ -50,10 +50,10 @@
   (package-refresh-contents))
 
 (defvar my-packages '(starter-kit starter-kit-lisp starter-kit-eshell
-                                  starter-kit-bindings 
+                                  starter-kit-bindings
                                   color-theme color-theme-twilight
                                   markdown-mode yaml-mode
-                                  cygwin-mount 
+                                  cygwin-mount
                                   maxframe undo-tree
                                   marmalade oddmuse))
 
@@ -106,18 +106,28 @@
                                          '("\\.styl$" . sws-mode))
                             (add-to-list 'auto-mode-alist
                                          '("\\.jade$" . sws-mode))))
+        (:name describe-symbol
+               :type http
+               :url "http://dea.googlecode.com/svn/trunk/my-lisps/describe-symbol.el")
+        (:name find-symbol
+               :type http
+               :url "http://dea.googlecode.com/svn/trunk/my-lisps/find-symbol.el")
+        (:name post-command-hook
+               :type http
+               :url "http://dea.googlecode.com/svn/trunk/my-lisps/post-command-hook.el")
         ))
 
 (setq my-el-packages
       (append
-       '(el-get auto-complete textmate goto-last-change yasnippet)
+       '(el-get auto-complete textmate goto-last-change twittering-mode
+                yasnippet)
        (mapcar 'el-get-source-name el-get-sources)))
 
 (el-get 'sync my-el-packages)
 
 ;; You can keep all- user-specific customizations here
 (setq system-specific-config (concat dotfiles-dir system-name ".el")
-      user-all-config (concat dotfiles-dir  "all.el")      
+      user-all-config (concat dotfiles-dir  "all.el")
       user-all-dir (concat dotfiles-dir "all")
       user-specific-config (concat dotfiles-dir user-login-name ".el")
       user-specific-dir (concat dotfiles-dir user-login-name))
@@ -142,5 +152,4 @@
 (message "Emacs startup time: %d seconds."
          (float-time (time-since emacs-load-start-time)))
 ;;; init.el ends here
-
-
+(put 'ido-exit-minibuffer 'disabled nil)

@@ -18,7 +18,7 @@
 ;;           (lambda () (flymake-mode t)))
 
 ;;; customize yasnippet
-(require 'yasnippet) 
+(require 'yasnippet)
 (yas/initialize)
 (yas/load-directory (concat dotfiles-dir "snippets"))
 (yas/global-mode)
@@ -34,13 +34,14 @@
       (setq exec-path (cons (concat  "/") exec-path))
       (load-file "all/setup-cygwin.el"))
 (progn
-  (setenv "PATH" (concat (concat  "/opt/local/bin:/opt/local/sbin:/usr/local/bin:")
-                         (getenv "PATH")))
+  (setenv "PATH" (concat
+                  (concat  "/opt/local/bin:/opt/local/sbin:/usr/local/bin:")
+                  (getenv "PATH")))
   (setq exec-path (append '("/opt/local/bin" "/opt/local/sbin" "/usr/local/bin")
                           exec-path))))
 
 
-;; maxframe.el 
+;; maxframe.el ??has bug in mac-ox emacs
 (require 'maxframe)
 ;; (add-hook 'window-setup-hook 'maximize-frame t)
 
@@ -68,10 +69,15 @@
 
 ;;(add-hook 'prog-mode-hook 'my-turn-on-folding)
 
-;(load "all-misc")
+;; find-symbol from ahai
+(require 'find-symbol)
+
+;; load my custom defined
+
+(load "all-misc")
 (load "all-defun")
 (load "all-binding")
 
 (load "all-js")
-
-
+(load "all-org")
+(load "all-twitter")

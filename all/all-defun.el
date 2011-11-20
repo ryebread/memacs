@@ -87,6 +87,47 @@
         (kill-buffer (car buffers))
         (setq buffers (cdr buffers))))))
 
+;; 删除一些临时的buffers
+(defvar my-clean-buffers-names
+  '("\\*Completions" "\\*Compile-Log" "\\*.*[Oo]utput\\*$"
+    "\\*Apropos" "\\*compilation" "\\*Customize" "\\*Calc""\\keywiz-scores"
+    "\\*BBDB\\*" "\\*trace of SMTP" "\\*vc" "\\*cvs" "\\*keywiz"
+    "\\*WoMan-Log" "\\*tramp" "\\*desktop\\*" "\\*Async Shell Command"
+    "\\*Backtrace\\*" "\\*twmode"
+    )  "List of regexps matching names of buffers to kill.")
+
+(defvar my-clean-buffers-modes
+  '(help-mode Info-mode not-loaded-yet)
+  "List of modes whose buffers will be killed.")
+
+(defun my-clean-buffers ()
+  "Kill buffers as per `my-clean-buffer-list' and `my-clean-buffer-modes'."
+  (interactive)
+  (let (string buffname)
+    (mapc (lambda (buffer)
+            (and (setq buffname (buffer-name buffer))
+                 (or (catch 'found
+                       (mapc '(lambda (name)
+                                (if (string-match name buffname)
+                                    (throw 'found t)))
+                             my-clean-buffers-names)
+                       nil)
+                     (save-excursion
+                       (set-buffer buffname)
+                       (catch 'found
+                         (mapc '(lambda (mode)
+                                  (if (eq major-mode mode)
+                                      (throw 'found t)))
+                               my-clean-buffers-modes)
+                         nil)))
+                 (kill-buffer buffname)
+                 (setq string (concat string
+                                      (and string ", ") buffname))))
+          (buffer-list))
+    (if string (message "Deleted: %s" string)
+      (message "No buffers deleted"))))
+
+
 ;;; duplicate the current line
 (defun my-duplicate-line ()
   (interactive)
@@ -112,3 +153,38 @@ This emulates Vim's `dt` behavior, which rocks."
                  (search-forward (char-to-string char) nil nil arg)
                  (- (point) 1)))
   (backward-char 1))
+
+;; function to Copy-only instead of kill (reddit comments)
+(defun copy-line (arg)
+  "Copy lines (as many as prefix argument) in the kill ring"
+  (interactive "p")
+  (kill-ring-save (line-beginning-position)
+                  (line-beginning-position (+ 1 arg)))
+  (message "%d line%s copied" arg (if (= 1 arg) "" "s")))
+
+(defun smart-copy (arg)
+  "智能拷贝, 如果`mark-active'的话, 则`copy-region', 否则`copy-lines'"
+  (interactive "p")
+  (if mark-active (call-interactively 'copy-region-as-kill)
+    (call-interactively 'copy-line arg)))
+
+
+;; function to display Tip of the Day
+(defconst animate-n-steps 3)
+(require 'cl)
+(random t)
+(defun totd ()
+  (interactive)
+  (let* ((commands (loop for s being the symbols
+                         when (commandp s) collect s))
+         (command (nth (random (length commands)) commands)))
+    (animate-string (concat ";; Initialization successful, welcome to "
+                            (substring (emacs-version) 0 16)
+                            "\n"
+                            "Your tip for the day is:\n========================\n\n"
+                            (describe-function command)
+                            (delete-other-windows)
+                            "\n\nInvoke with:\n\n"
+                            (where-is command t)
+                            (delete-other-windows)
+                            )0 0)))
