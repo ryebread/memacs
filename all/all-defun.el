@@ -63,3 +63,52 @@
       (set-window-start w1 s2)
       (set-window-start w2 s1)))
   (other-window 1))
+
+;;; url fetch page to buffer
+(defun url-fetch-into-buffer (url)
+  (interactive "sURL:")
+  (insert (concat "\n\n" ";; " url "\n"))
+  (insert (url-fetch-to-string url)))
+
+(defun url-fetch-to-string (url)
+  (with-current-buffer (url-retrieve-synchronously url)
+    (beginning-of-buffer)
+    (search-forward-regexp "\n\n")
+    (delete-region (point-min) (point))
+    (buffer-string)))
+
+;;; Kill all buffer but safe's group
+(defun my-clean-slate ()
+  "Kills all buffers except *scratch*"
+  (interactive)
+  (let ((buffers (buffer-list)) (safe '("*scratch*")))
+    (while buffers
+      (when (not (member (car buffers) safe))
+        (kill-buffer (car buffers))
+        (setq buffers (cdr buffers))))))
+
+;;; duplicate the current line
+(defun my-duplicate-line ()
+  (interactive)
+    (beginning-of-line)
+    (copy-region-as-kill (point) (progn (end-of-line) (point)))
+    (textmate-next-line)
+    (yank)
+    (beginning-of-line)
+    (indent-according-to-mode))
+
+;;; zap to char but excluding ARG
+(defun my-zap-to-char (arg char)
+  "Kill up to but excluding ARG'th occurrence of CHAR.
+
+Case is ignored if `case-fold-search' is non-nil in the current buffer.
+Goes backward if ARG is negative; error if CHAR not found.
+This emulates Vim's `dt` behavior, which rocks."
+  (interactive "p\ncZap to char: ")
+  (if (char-table-p translation-table-for-input)
+      (setq char (or (aref translation-table-for-input char) char)))
+  (kill-region (point)
+               (progn
+                 (search-forward (char-to-string char) nil nil arg)
+                 (- (point) 1)))
+  (backward-char 1))

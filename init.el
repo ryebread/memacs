@@ -33,13 +33,14 @@
 ;; Load path etc.
 (setq dotfiles-dir (file-name-directory
                     (or (buffer-file-name) load-file-name)))
-
-;; Load up ELPA, the package manager
-
 (add-to-list 'load-path dotfiles-dir)
 
-(setq custom-file (concat dotfiles-dir "custom.el"))
+;;; move frame to right of display(need modify to adapt diffent
+;;; dimension and OS
+ (setq initial-frame-alist
+       '((top . 1) (left . 781) (width . 80) (height . 43)))
 
+;; Load up ELPA, the package manager
 (require 'package)
 (add-to-list 'package-archives
              '("marmalade" . "http://marmalade-repo.org/packages/"))
@@ -49,10 +50,10 @@
   (package-refresh-contents))
 
 (defvar my-packages '(starter-kit starter-kit-lisp starter-kit-eshell
-                                  starter-kit-bindings starter-kit-js
+                                  starter-kit-bindings 
                                   color-theme color-theme-twilight
                                   markdown-mode yaml-mode
-                                  cygwin-mount
+                                  cygwin-mount 
                                   maxframe undo-tree
                                   marmalade oddmuse))
 
@@ -62,6 +63,7 @@
 
 
 ;;; add el-get package,use it manager git,svn... packages
+(setq el-get-dir (concat dotfiles-dir "el-get"))
 (add-to-list 'load-path (concat dotfiles-dir "el-get/el-get" ))
 (unless (require 'el-get nil t)
   (url-retrieve
@@ -69,12 +71,23 @@
    (lambda (s)
        (end-of-buffer)
        (eval-print-last-sexp))))
+
 ;;; set local sources
 (setq el-get-sources
       '((:name smart-mark
                :type git
                :url "https://github.com/brianjcj/smart-mark.git"
                :post-init (lambda () (require 'smart-mark)))
+        (:name yasnippet
+               :type git
+               :url "https://github.com/capitaomorte/yasnippet.git")
+        (:name js2-mode
+               :type git
+               :url "https://github.com/mooz/js2-mode.git"
+               :description "An improved JavaScript editing mode"
+               :compile "js2-mode.el"
+               :post-init (lambda ()
+                            (autoload 'js2-mode "js2-mode" nil t)))
         (:name jshint-mode
                :type git
                :url "https://github.com/daleharvey/jshint-mode.git"
@@ -89,13 +102,15 @@
                :post-init (lambda ()
                             (require 'sws-mode)
                             (require 'jade-mode)
-                            (add-to-list 'auto-mode-alist  '("\\.styl$" . sws-mode))
-                            (add-to-list 'auto-mode-alist '("\\.jade$" . sws-mode))))
+                            (add-to-list 'auto-mode-alist
+                                         '("\\.styl$" . sws-mode))
+                            (add-to-list 'auto-mode-alist
+                                         '("\\.jade$" . sws-mode))))
         ))
 
 (setq my-el-packages
       (append
-       '(el-get auto-complete yasnippet)
+       '(el-get auto-complete textmate goto-last-change yasnippet)
        (mapcar 'el-get-source-name el-get-sources)))
 
 (el-get 'sync my-el-packages)
@@ -121,7 +136,7 @@
 (load  "color-theme-twilight")
 (color-theme-twilight)
 
-
+(setq custom-file (concat dotfiles-dir "custom.el"))
 (load custom-file 'noerror)
 
 (message "Emacs startup time: %d seconds."

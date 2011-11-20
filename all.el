@@ -17,18 +17,18 @@
 ;; (add-hook 'javascript-mode-hook
 ;;           (lambda () (flymake-mode t)))
 
-;;; customize yasnippet(el-get has alredy init it)
+;;; customize yasnippet
 (require 'yasnippet) 
 (yas/initialize)
-(yas/global-mode t)
 (yas/load-directory (concat dotfiles-dir "snippets"))
+(yas/global-mode)
 
 ;;; undo-tree
 (require 'undo-tree)
 (global-undo-tree-mode)
 
 ;;; add cygwin support on windows platform
-(if (eq system-name 'windows-nt)
+(if (eq system-type 'windows-nt)
     (progn
       (setenv "PATH" (concat (concat  ";") (getenv "PATH")))
       (setq exec-path (cons (concat  "/") exec-path))
@@ -67,4 +67,11 @@
   (flymake-mode t))
 
 ;;(add-hook 'prog-mode-hook 'my-turn-on-folding)
+
+;(load "all-misc")
+(load "all-defun")
+(load "all-binding")
+
+(load "all-js")
+
 
