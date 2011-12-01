@@ -1,5 +1,5 @@
-(defun my-ido-goto-symbol (&optional symbol-list)
-  "Refresh imenu and jump to a place in the buffer using Ido.--prelude"
+(defun ido-goto-symbol (&optional symbol-list)
+  "Refresh imenu and jump to a place in the buffer using Ido."
   (interactive)
   (unless (featurep 'imenu)
     (require 'imenu nil t))
@@ -16,7 +16,7 @@
       (while (progn
                (imenu--cleanup)
                (setq imenu--index-alist nil)
-               (prelude-ido-goto-symbol (imenu--make-index-alist))
+               (ido-goto-symbol (imenu--make-index-alist))
                (setq selected-symbol
                      (ido-completing-read "Symbol? " symbol-names))
                (string= (car imenu--rescan-item) selected-symbol)))
@@ -33,7 +33,7 @@
       (let (name position)
         (cond
          ((and (listp symbol) (imenu--subalist-p symbol))
-          (prelude-ido-goto-symbol symbol))
+          (ido-goto-symbol symbol))
          ((listp symbol)
           (setq name (car symbol))
           (setq position (cdr symbol)))
@@ -93,11 +93,11 @@
     "\\*Apropos" "\\*compilation" "\\*Customize" "\\*Calc""\\keywiz-scores"
     "\\*BBDB\\*" "\\*trace of SMTP" "\\*vc" "\\*cvs" "\\*keywiz"
     "\\*WoMan-Log" "\\*tramp" "\\*desktop\\*" "\\*Async Shell Command"
-    "\\*Backtrace\\*" "\\*twmode"
+    "\\*Backtrace\\*" "\\*twmode" "\\*Messages\\*" "\\*Buffer"
     )  "List of regexps matching names of buffers to kill.")
 
 (defvar my-clean-buffers-modes
-  '(help-mode Info-mode not-loaded-yet)
+  '(help-mode Info-mode not-loaded-yet magit-mode)
   "List of modes whose buffers will be killed.")
 
 (defun my-clean-buffers ()
@@ -171,7 +171,6 @@ This emulates Vim's `dt` behavior, which rocks."
 
 ;; function to display Tip of the Day
 (defconst animate-n-steps 3)
-(require 'cl)
 (random t)
 (defun totd ()
   (interactive)

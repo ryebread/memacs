@@ -72,6 +72,11 @@
 ;; find-symbol from ahai
 (require 'find-symbol)
 
+
+;;; load for mac platform customize
+(when (eq system-type 'darwin)
+  (load "all-mac"))
+
 ;; load my custom defined
 
 (load "all-misc")
