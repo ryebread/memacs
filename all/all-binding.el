@@ -29,7 +29,7 @@
 
 
 (global-set-key (kbd "C-x C-k") 'my-clean-buffers) ;delete temp buffers
-(global-set-key (kbd "C-c C-k") 'my-clean-slate)   ;clean slate
+(global-set-key (kbd "C-x C-K") 'my-clean-slate)   ;clean slate
 
 ;; Jump to a definition in the current file. (This is awesome.)
 (global-set-key (kbd "M-i") 'ido-goto-symbol)
@@ -48,5 +48,5 @@
 (global-set-key "\C-c\C-m" 'smex)
 (global-set-key "\M-z" 'my-zap-to-char)
 
-(global-set-key [C-return] 'my-duplicate-line)
+;;(global-set-key [C-return] 'my-duplicate-line)
 (global-set-key (kbd "C-,") 'goto-last-change)

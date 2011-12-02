@@ -29,10 +29,7 @@
 
 ;;; add cygwin support on windows platform
 (if (eq system-type 'windows-nt)
-    (progn
-      (setenv "PATH" (concat (concat  ";") (getenv "PATH")))
-      (setq exec-path (cons (concat  "/") exec-path))
-      (load-file "all/setup-cygwin.el"))
+    (load "setup-cygwin")
 (progn
   (setenv "PATH" (concat
                   (concat  "/opt/local/bin:/opt/local/sbin:/usr/local/bin:")

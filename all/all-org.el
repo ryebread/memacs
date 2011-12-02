@@ -48,3 +48,4 @@
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key "\C-cm" 'org-remember)
 (global-set-key "\C-cj" 'org-journal-entry)
+(global-set-key "\C-cb" 'org-iswitchb)

@@ -63,59 +63,64 @@
 ;;
 ;;; Code:
 
-(setq cygwin-root "d:/Tools/Luw/App/cygwin")
-(setq cygwin-bin (concat cygwin-root "/bin"))
-(setenv "PATH" (concat (concat cygwin-bin ";") (getenv "PATH")))
-(setq exec-path (cons (concat cygwin-bin "/") exec-path))
-(require 'cygwin-mount)
+(let* ((cygwin-root "d:/Tools/Cygwin")
+       (cygwin-bin (concat cygwin-root "/bin")))
+  (when (and (eq 'windows-nt system-type)
+             (file-readable-p cygwin-root))
+
+    (setq exec-path (cons cygwin-bin exec-path))   
+    (setenv "PATH" (concat cygwin-bin ";" (getenv "PATH")))
+
+
+    (require 'cygwin-mount)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;; Make Cygwin paths accessible
-(cygwin-mount-activate)
+    (cygwin-mount-activate)
 
 ;;; Follow Cygwin symlinks.
 ;;; Handles old-style (text file) symlinks and new-style (.lnk file) symlinks.
 ;;; (Non-Cygwin-symlink .lnk files, such as desktop shortcuts, are still loaded as such.)
-(defun follow-cygwin-symlink ()
-  "Follow Cygwin symlinks.
+    (defun follow-cygwin-symlink ()
+      "Follow Cygwin symlinks.
 Handles old-style (text file) and new-style (.lnk file) symlinks.
 \(Non-Cygwin-symlink .lnk files, such as desktop shortcuts, are still
 loaded as such.)"
-  (save-excursion
-    (goto-char 0)
-    (if (looking-at
-         "L\x000\x000\x000\x001\x014\x002\x000\x000\x000\x000\x000\x0C0\x000\x000\x000\x000\x000\x000\x046\x00C")
-        (progn
-          (re-search-forward
-           "\x000\\([-A-Za-z0-9_\\.\\\\\\$%@(){}~!#^'`][-A-Za-z0-9_\\.\\\\\\$%@(){}~!#^'`]+\\)")
-          (find-alternate-file (match-string 1)))
-      (if (looking-at "!<symlink>")
-          (progn
-            (re-search-forward "!<symlink>\\(.*\\)\0")
-            (find-alternate-file (match-string 1))))
-      )))
-(add-hook 'find-file-hooks 'follow-cygwin-symlink)
+      (save-excursion
+        (goto-char 0)
+        (if (looking-at
+             "L\x000\x000\x000\x001\x014\x002\x000\x000\x000\x000\x000\x0C0\x000\x000\x000\x000\x000\x000\x046\x00C")
+            (progn
+              (re-search-forward
+               "\x000\\([-A-Za-z0-9_\\.\\\\\\$%@(){}~!#^'`][-A-Za-z0-9_\\.\\\\\\$%@(){}~!#^'`]+\\)")
+              (find-alternate-file (match-string 1)))
+          (if (looking-at "!<symlink>")
+              (progn
+                (re-search-forward "!<symlink>\\(.*\\)\0")
+                (find-alternate-file (match-string 1))))
+          )))
+    (add-hook 'find-file-hooks 'follow-cygwin-symlink)
 
 ;;; Use Unix-style line endings.
-(setq-default buffer-file-coding-system 'undecided-unix)
+    (setq-default buffer-file-coding-system 'undecided-unix)
 
 
 ;;; Add Cygwin Info pages
-(setq Info-default-directory-list (append Info-default-directory-list (list (concat cygwin-root "/usr/info/"))))
+    (setq Info-default-directory-list (append Info-default-directory-list (list (concat cygwin-root "/usr/info/"))))
 
 
 ;;; Use `bash' as the default shell in Emacs.
-(setq shell-file-name "bash.exe") ; Subprocesses invoked via the shell.
-(setenv "SHELL" shell-file-name)
-(setq explicit-shell-file-name shell-file-name) ; Interactive shell
-(setq ediff-shell shell-file-name)      ; Ediff shell
-(setq explicit-shell-args '("--login" "-i"))
+    (setq shell-file-name "bash.exe") ; Subprocesses invoked via the shell.
+    (setenv "SHELL" shell-file-name)
+    (setq explicit-shell-file-name shell-file-name) ; Interactive shell
+    (setq ediff-shell shell-file-name)      ; Ediff shell
+    (setq explicit-shell-args '("--login" "-i"))
 ;;;;; (setq shell-command-switch "-ic") ; SHOULD THIS BE "-c" or "-ic"?
-(setq w32-quote-process-args ?\") ;; " @@@ IS THIS BETTER? ;@@@ WAS THIS BEFORE: (setq w32-quote-process-args t)
+    (setq w32-quote-process-args ?\") ;; " @@@ IS THIS BETTER? ;@@@ WAS THIS BEFORE: (setq w32-quote-process-args t)
 
-;; These don't seem to be needed.
-;; They were recommended by http://www.khngai.com/emacs/cygwin.php
+    ;; These don't seem to be needed.
+    ;; They were recommended by http://www.khngai.com/emacs/cygwin.php
 ;;;;; (add-hook 'comint-output-filter-functions
 ;;;;;     'shell-strip-ctrl-m nil t)
 ;;;;; ;; Removes unsightly ^M characters that would otherwise appear in output of java applications.
@@ -128,78 +133,77 @@ loaded as such.)"
 
 
 ;;;###autoload
-(defun bash ()
-  "Start `bash' shell."
-  (interactive)
-  (let ((binary-process-input t)
-        (binary-process-output nil))
-    (shell)))
+    (defun bash ()
+      "Start `bash' shell."
+      (interactive)
+      (let ((binary-process-input t)
+            (binary-process-output nil))
+        (shell)))
 
-(setq process-coding-system-alist
-      (cons '("bash" . (raw-text-dos . raw-text-unix)) process-coding-system-alist))
+    (setq process-coding-system-alist
+          (cons '("bash" . (raw-text-dos . raw-text-unix)) process-coding-system-alist))
 
 
-;; From: http://www.dotfiles.com/files/6/235_.emacs
+    ;; From: http://www.dotfiles.com/files/6/235_.emacs
 ;;;###autoload
-(defun set-shell-bash()
-  "Enable on-the-fly switching between the bash shell and DOS."
-  (interactive)
-  ;; (setq binary-process-input t)
-  (setq shell-file-name "bash")
-  (setq shell-command-switch "-c")      ; SHOULD IT BE (setq shell-command-switch "-ic")?
-  (setq explicit-shell-file-name "bash")
-  (setenv "SHELL" explicit-shell-file-name)
+    (defun set-shell-bash()
+      "Enable on-the-fly switching between the bash shell and DOS."
+      (interactive)
+      ;; (setq binary-process-input t)
+      (setq shell-file-name "bash")
+      (setq shell-command-switch "-c")      ; SHOULD IT BE (setq shell-command-switch "-ic")?
+      (setq explicit-shell-file-name "bash")
+      (setenv "SHELL" explicit-shell-file-name)
   ;;;;;(setq explicit-sh-args '("-login" "-i")) ; Undefined?
-  (setq w32-quote-process-args ?\") ;; "
+      (setq w32-quote-process-args ?\") ;; "
   ;;;;;(setq mswindows-quote-process-args t)) ; Undefined?
-  )
+      )
 
 ;;;###autoload
-(defun set-shell-cmdproxy()
-  "Set shell to `cmdproxy'."
-  (interactive)
-  (setq shell-file-name "cmdproxy")
-  (setq explicit-shell-file-name "cmdproxy")
-  (setenv "SHELL" explicit-shell-file-name)
+    (defun set-shell-cmdproxy()
+      "Set shell to `cmdproxy'."
+      (interactive)
+      (setq shell-file-name "cmdproxy")
+      (setq explicit-shell-file-name "cmdproxy")
+      (setenv "SHELL" explicit-shell-file-name)
   ;;;;;(setq explicit-sh-args nil)           ; Undefined?
-  (setq w32-quote-process-args nil))
+      (setq w32-quote-process-args nil))
 
 
 ;;; some shell customize
-(add-hook 'shell-mode-hook 'n-shell-mode-hook)
-(defun n-shell-mode-hook ()
-  "12Jan2002 - sailor, shell mode customizations."
-  (local-set-key '[up] 'comint-previous-input)
-  (local-set-key '[down] 'comint-next-input)
-  (local-set-key '[(shift tab)] 'comint-next-matching-input-from-input)
-  (setq comint-input-sender 'n-shell-simple-send)
-  )
+    (add-hook 'shell-mode-hook 'n-shell-mode-hook)
+    (defun n-shell-mode-hook ()
+      "12Jan2002 - sailor, shell mode customizations."
+      (local-set-key '[up] 'comint-previous-input)
+      (local-set-key '[down] 'comint-next-input)
+      (local-set-key '[(shift tab)] 'comint-next-matching-input-from-input)
+      (setq comint-input-sender 'n-shell-simple-send)
+      )
 
-(defun n-shell-simple-send (proc command)
-  "17Jan02 - sailor. Various commands pre-processing before sending to shell."
-  (cond
-   ;; Checking for clear command and execute it.
-   ((string-match "^[ \t]*clear[ \t]*$" command)
-    (comint-send-string proc "\n")
-    (erase-buffer)
-    )
-   ;; Checking for man command and execute it.
-   ((string-match "^[ \t]*man[ \t]*" command)
-    (comint-send-string proc "\n")
-    (setq command (replace-regexp-in-string "^[ \t]*man[ \t]*" "" command))
-    (setq command (replace-regexp-in-string "[ \t]+$" "" command))
-    ;;(message (format "command %s command" command))
-    (funcall 'man command)
-    )
-   ;; Send other commands to the default handler.
-   (t (comint-simple-send proc command))
-   )
-  )
+    (defun n-shell-simple-send (proc command)
+      "17Jan02 - sailor. Various commands pre-processing before sending to shell."
+      (cond
+       ;; Checking for clear command and execute it.
+       ((string-match "^[ \t]*clear[ \t]*$" command)
+        (comint-send-string proc "\n")
+        (erase-buffer)
+        )
+       ;; Checking for man command and execute it.
+       ((string-match "^[ \t]*man[ \t]*" command)
+        (comint-send-string proc "\n")
+        (setq command (replace-regexp-in-string "^[ \t]*man[ \t]*" "" command))
+        (setq command (replace-regexp-in-string "[ \t]+$" "" command))
+        ;;(message (format "command %s command" command))
+        (funcall 'man command)
+        )
+       ;; Send other commands to the default handler.
+       (t (comint-simple-send proc command))
+       )
+      )
+))
+;;;;;;;;;;;;;;;;;;;;;
 
-
-;;;;;;;;;;;;;;;;;;;;;;;
-
-(provide 'setup-cygwin)
+  (provide 'setup-cygwin)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; setup-cygwin.el ends here

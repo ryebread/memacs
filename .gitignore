@@ -3,8 +3,10 @@ back*/
 places
 .smex*
 el-get/
+*.elc
 ac-*
 /auto-save-list/*
 /eshell/history
 /bookmarks
 /custom.el
+/url/

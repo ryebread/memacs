@@ -128,15 +128,26 @@
       (message "No buffers deleted"))))
 
 
-;;; duplicate the current line
-(defun my-duplicate-line ()
-  (interactive)
-    (beginning-of-line)
-    (copy-region-as-kill (point) (progn (end-of-line) (point)))
-    (textmate-next-line)
-    (yank)
-    (beginning-of-line)
-    (indent-according-to-mode))
+;;; duplicate the current line or region
+(defun duplicate-current-line-or-region (arg)
+  "Duplicates the current line or region ARG times.
+If there's no region, the current line will be duplicated. However, if
+there's a region, all lines that region covers will be duplicated."
+  (interactive "p")
+  (let (beg end (origin (point)))
+    (if (and mark-active (> (point) (mark)))
+        (exchange-point-and-mark))
+    (setq beg (line-beginning-position))
+    (if mark-active
+        (exchange-point-and-mark))
+    (setq end (line-end-position))
+    (let ((region (buffer-substring-no-properties beg end)))
+      (dotimes (i arg)
+        (goto-char end)
+        (newline)
+        (insert region)
+        (setq end (point)))
+      (goto-char (+ origin (* (length region) arg) arg)))))
 
 ;;; zap to char but excluding ARG
 (defun my-zap-to-char (arg char)
