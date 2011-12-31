@@ -76,10 +76,11 @@
 
 ;; load my custom defined
 
-(load "all-misc")
+
 (load "all-defun")
 (load "all-binding")
 
 (load "all-js")
 (load "all-org")
 (load "all-twitter")
+(load "all-misc")

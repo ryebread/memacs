@@ -1,7 +1,7 @@
 ;; -*- Emacs-Lisp -*- init.el --- Where all the magic begins
 
 ;; Copyright (C) 1996-2010 Liubin
-;; Time-stamp: <2011-11-20 12:09:33 Sunday by ryebread>
+;; Time-stamp: <2011-12-30 12:10:16 (Administrator)>
 
 ;;  __
 ;; / /   ()    /7  ()_
@@ -34,11 +34,6 @@
 (setq dotfiles-dir (file-name-directory
                     (or (buffer-file-name) load-file-name)))
 (add-to-list 'load-path dotfiles-dir)
-
-;;; move frame to right of display(need modify to adapt diffent
-;;; dimension and OS
- (setq initial-frame-alist
-       '((top . 1) (left . 781) (width . 80) (height . 43)))
 
 ;; Load up ELPA, the package manager
 (require 'package)
